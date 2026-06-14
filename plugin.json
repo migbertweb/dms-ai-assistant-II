@@ -1,9 +1,9 @@
 {
   "id": "aiAssistant",
-  "name": "AI Assistant",
-  "description": "Integrated AI chat assistant with markdown support",
-  "version": "1.6.0",
-  "author": "devnullvoid",
+  "name": "Asistente Personal",
+  "description": "Chat de IA Integrada con soporte markdown",
+  "version": "1.0.0",
+  "author": "migbertweb",
   "type": "daemon",
   "capabilities": [
     "slideout",

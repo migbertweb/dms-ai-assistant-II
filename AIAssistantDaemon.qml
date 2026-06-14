@@ -35,7 +35,7 @@ Item {
             delegate: DankSlideout {
                 id: slideout
                 required property var modelData
-                title: "AI Assistant"
+                title: "Asistente Personal"
                 slideoutWidth: 480
                 expandable: true
                 expandedWidthValue: 960
