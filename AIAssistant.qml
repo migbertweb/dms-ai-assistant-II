@@ -181,6 +181,42 @@ Item {
                 Layout.alignment: Qt.AlignVCenter
             }
 
+            // Badge Hermes
+            Rectangle {
+                visible: aiService.isHermesMode
+                radius: Theme.cornerRadius
+                color: Theme.surfaceVariant
+                height: Theme.fontSizeSmall * 1.6
+                Layout.preferredWidth: hermesBadgeText.implicitWidth + Theme.spacingM
+                Layout.alignment: Qt.AlignVCenter
+
+                StyledText {
+                    id: hermesBadgeText
+                    anchors.centerIn: parent
+                    text: "🤖 Hermes"
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                }
+            }
+
+            // Badge tokens
+            Rectangle {
+                visible: !aiService.isStreaming && aiService.isHermesMode && aiService.lastTotalTokens > 0
+                radius: Theme.cornerRadius
+                color: Theme.surfaceVariant
+                height: Theme.fontSizeSmall * 1.6
+                Layout.preferredWidth: tokenBadgeText.implicitWidth + Theme.spacingM
+                Layout.alignment: Qt.AlignVCenter
+
+                StyledText {
+                    id: tokenBadgeText
+                    anchors.centerIn: parent
+                    text: "⚡" + aiService.lastTotalTokens + " tok"
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                }
+            }
+
             Rectangle {
                 visible: aiService.isStreaming
                 radius: Theme.cornerRadius

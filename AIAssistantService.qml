@@ -33,6 +33,11 @@ Item {
     property real streamStartedAtMs: 0
     property string lastUserText: ""
     property int lastHttpStatus: 0
+    property string hermesSessionId: ""
+    property int lastPromptTokens: 0
+    property int lastCompletionTokens: 0
+    property int lastTotalTokens: 0
+    property bool isHermesMode: false
 
     // Settings
     property var providers: ({})
@@ -242,6 +247,7 @@ Item {
         geminiWebSearch = !!active.geminiWebSearch
         useMonospace = PluginService.loadPluginData(pluginId, "useMonospace", false)
         suppressConfigChange = false
+        checkHermesMode()
         refreshAvailableModels(false)
 
         const currentHash = computeConfigHash();
@@ -342,6 +348,7 @@ Item {
     function handleConfigChanged() {
         if (suppressConfigChange)
             return;
+        checkHermesMode()
         const current = computeConfigHash();
         if (providerConfigHash && providerConfigHash !== current) {
             switchConfigHistory(current)
@@ -518,6 +525,12 @@ Item {
             markError(streamId, "No API key or provider configuration.");
             return;
         }
+
+        // Resetear metadatos de la sesión anterior
+        hermesSessionId = "";
+        lastPromptTokens = 0;
+        lastCompletionTokens = 0;
+        lastTotalTokens = 0;
 
         streamCollector.lastLen = 0;
         streamBuffer = "";
@@ -746,6 +759,15 @@ Item {
                     }
                 });
             } else { // openai
+                // Capture session_id Hermes (viene en cada chunk)
+                if (data.id && !hermesSessionId)
+                    hermesSessionId = data.id;
+                // Capturar usage tokens (último chunk)
+                if (data.usage) {
+                    lastPromptTokens = data.usage.prompt_tokens || 0;
+                    lastCompletionTokens = data.usage.completion_tokens || 0;
+                    lastTotalTokens = data.usage.total_tokens || 0;
+                }
                 const deltas = data.choices?.[0]?.delta?.content;
                 if (Array.isArray(deltas)) {
                     deltas.forEach(d => {
@@ -790,6 +812,20 @@ Item {
                     setMessageContentById(activeStreamId, parsed);
                 }
             }
+        }
+
+        // Capturar session_id y usage en modo no-streaming (fallback)
+        if (!hermesSessionId || lastTotalTokens === 0) {
+            try {
+                const fallbackData = JSON.parse(bodyText);
+                if (fallbackData.id && !hermesSessionId)
+                    hermesSessionId = fallbackData.id;
+                if (fallbackData.usage) {
+                    lastPromptTokens = fallbackData.usage.prompt_tokens || 0;
+                    lastCompletionTokens = fallbackData.usage.completion_tokens || 0;
+                    lastTotalTokens = fallbackData.usage.total_tokens || 0;
+                }
+            } catch (_) {}
         }
 
         if (lastHttpStatus >= 400 && isStreaming) {
@@ -872,6 +908,12 @@ Item {
                 return m.content;
         }
         return "";
+    }
+
+    function checkHermesMode() {
+        const p = provider;
+        const url = baseUrl;
+        isHermesMode = p === "custom" && (url.includes("127.0.0.1:8420") || url.includes("localhost:8420") || url.includes("hermes"));
     }
 
     function refreshAvailableModels(force) {

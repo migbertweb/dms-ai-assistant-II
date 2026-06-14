@@ -848,6 +848,76 @@ Item {
                                 }
                             }
                         }
+
+                        // ── Hermes Agent Status ──
+                        Item {
+                            visible: aiService && aiService.isHermesMode
+                            width: parent.width
+                            height: hermesColumn.height + Theme.spacingL * 2
+
+                            Column {
+                                id: hermesColumn
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: Theme.spacingM
+
+                                Row {
+                                    spacing: Theme.spacingS
+                                    StyledText {
+                                        text: "🤖 Hermes Agent"
+                                        font.pixelSize: Theme.fontSizeLarge
+                                        font.weight: Font.Medium
+                                        color: Theme.surfaceText
+                                    }
+                                }
+
+                                Column {
+                                    spacing: Theme.spacingXS
+                                    width: parent.width
+
+                                    StyledText {
+                                        width: parent.width
+                                        text: "Model: " + (aiService.model || "—")
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                        wrapMode: Text.WordWrap
+                                    }
+                                    StyledText {
+                                        width: parent.width
+                                        text: "Endpoint: " + (aiService.baseUrl || "—")
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                        wrapMode: Text.WordWrap
+                                    }
+                                    StyledText {
+                                        width: parent.width
+                                        text: "Status: " + (aiService.isOnline ? "✅ Connected" : "⏳ Disconnected")
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                        wrapMode: Text.WordWrap
+                                    }
+                                    StyledText {
+                                        width: parent.width
+                                        visible: aiService.hermesSessionId.length > 0
+                                        text: "Session: " + aiService.hermesSessionId
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                        wrapMode: Text.WordWrap
+                                        elide: Text.ElideMiddle
+                                    }
+                                    StyledText {
+                                        width: parent.width
+                                        visible: aiService.lastTotalTokens > 0
+                                        text: "Last tokens: " + aiService.lastTotalTokens + " (prompt: " + aiService.lastPromptTokens + ", completion: " + aiService.lastCompletionTokens + ")"
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                        wrapMode: Text.WordWrap
+                                    }
+                                }
+                            }
+                        }
+
                     }
                 }
             }
